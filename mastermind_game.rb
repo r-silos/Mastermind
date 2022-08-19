@@ -17,6 +17,7 @@ class Display
 
   def set_secret_code(code)
     @secret_code = code
+    print @secret_code
   end
 
   def set_current_guess(guess)
@@ -35,14 +36,61 @@ class Display
     end
   end
 
+=begin
   def guess_checker
     correct_guess_array = ['C', 'C', 'C', 'C']
     cg_array_placeholder = 0
     i = 0
-    #until i == correct_guess_array.length
-
+    until i == (correct_guess_array.length) -1
+      if @current_guess[i] == @secret_code[i]
+        correct_guess_array[cg_array_placeholder] = 'A'
+        cg_array_placeholder += 1
+      end
+      i += 1
+    end
 
   end
+=end
+
+  def perfect_match_checker()
+    correct_guess_array = ['C', 'C', 'C', 'C']
+    i = 0
+    cg_place = 0
+    until i == correct_guess_array.length
+      #puts "It is now checing index of #{i}"
+      if @current_guess[i] == @secret_code[i]
+        #puts "a match has been found"
+        correct_guess_array[cg_place] = 'A'
+        cg_place += 1
+      end
+      i += 1
+    end
+    return correct_guess_array
+  end
+
+  def alright_match_checker(c_g_array)
+    perfect_guesses = c_g_array.count('A')
+    puts perfect_guesses
+    correct_elements = (@current_guess & @secret_code).count
+    puts correct_elements
+    alright_elements = correct_elements - perfect_guesses
+    puts alright_elements
+    if alright_elements > 0
+      i = 0
+      until i == alright_elements
+        puts "alrtight assigner is running"
+        c_g_array[perfect_guesses + i] = 'B'
+        i += 1
+      end
+    end
+    print c_g_array
+    return c_g_array
+  end
+
+    
+
+
+
 end
 
 class Computer
@@ -119,11 +167,13 @@ game = Display.new
 
 
 sc = al.cpu_code_setter
-game.secret_code(sc)
+game.set_secret_code(sc)
 
 until game.game_over == true
   cg = john.human_code_guessor
   game.set_current_guess(cg)
+  temp = game.perfect_match_checker
+  game.alright_match_checker(temp)
   game.lives_reducer
   game.game_is_over?
 end
