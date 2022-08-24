@@ -1,3 +1,5 @@
+
+
 CODE_NUMBERS = [1, 2, 3, 4, 5, 6]
 
 class Display
@@ -48,7 +50,6 @@ class Display
       end
       i += 1
     end
-
   end
 =end
 
@@ -57,40 +58,52 @@ class Display
     i = 0
     cg_place = 0
     until i == correct_guess_array.length
-      #puts "It is now checing index of #{i}"
+      puts "It is now checing index of #{i}"
       if @current_guess[i] == @secret_code[i]
-        #puts "a match has been found"
+        puts "#{@current_guess[i]} matches #{@secret_code}"
         correct_guess_array[cg_place] = 'A'
         cg_place += 1
       end
       i += 1
     end
-    return correct_guess_array
+    correct_guess_array
   end
 
-  def alright_match_checker(c_g_array)
-    perfect_guesses = c_g_array.count('A')
-    puts perfect_guesses
-    correct_elements = (@current_guess & @secret_code).count
-    puts correct_elements
-    alright_elements = correct_elements - perfect_guesses
-    puts alright_elements
-    if alright_elements > 0
+  def alright_match_checker
+    #puts "new iteration of checker is running"
+    #print @secret_code
+    #puts
+    number_of_alright_guesses = 0
+    secret_code_copy = secret_code_cloner
+    @current_guess.each do |ele|
+    #  puts "we are now checking #{ele}"
       i = 0
-      until i == alright_elements
-        puts "alrtight assigner is running"
-        c_g_array[perfect_guesses + i] = 'B'
-        i += 1
+      while i < @secret_code.count
+        if ele == secret_code_copy[i]
+          number_of_alright_guesses += 1
+     #     puts "we have matching elements of guess #{ele} and secret code of #{@secret_code[i]} with an index of #{i}"
+          secret_code_copy.delete_at(i)
+     #     print "\n we now have #{secret_code_copy} as alright matches\n"
+          i += 1
+          break
+        else 
+          i += 1
+     #     puts "the else statement has been executed"
+        end
       end
     end
-    print c_g_array
-    return c_g_array
+     number_of_alright_guesses
   end
 
-    
-
-
-
+  def secret_code_cloner
+    k = 0
+    copied_array = []
+    while k < @secret_code.length
+      copied_array[k] = @secret_code[k]
+      k += 1
+    end
+    copied_array
+  end
 end
 
 class Computer
@@ -172,8 +185,11 @@ game.set_secret_code(sc)
 until game.game_over == true
   cg = john.human_code_guessor
   game.set_current_guess(cg)
-  temp = game.perfect_match_checker
-  game.alright_match_checker(temp)
+ # temp = game.perfect_match_checker
+ # print temp
+  ags = game.alright_match_checker
+  puts "The number of elements in guess found in secret code array is #{ags}"
+  puts
   game.lives_reducer
   game.game_is_over?
 end
