@@ -3,10 +3,10 @@
 CODE_NUMBERS = [1, 2, 3, 4, 5, 6]
 
 class Display
-  attr_reader :game_over, :gameboard
+  attr_reader :game_over, :gameboard, :game_won, :secret_code
 
   def initialize
-    @lives = 8
+    @lives = 7
     # gameboard keeps track of number guesses of codebreaker
     @gameboard = []
     # guessboard keeps track of whether each position is correct or not
@@ -15,11 +15,13 @@ class Display
     @game_over = false
     # varible to hold current iteration of guess from codebreaker
     @current_guess = []
+    # Variable to hold bool when game is won
+    @game_won = false
   end
 
   def set_secret_code(code)
     @secret_code = code
-    print @secret_code
+    #print @secret_code
   end
 
   def set_current_guess(guess)
@@ -38,29 +40,39 @@ class Display
     end
   end
 
-=begin
   def guess_checker
-    correct_guess_array = ['C', 'C', 'C', 'C']
-    cg_array_placeholder = 0
-    i = 0
-    until i == (correct_guess_array.length) -1
-      if @current_guess[i] == @secret_code[i]
-        correct_guess_array[cg_array_placeholder] = 'A'
-        cg_array_placeholder += 1
+    cg_array = perfect_match_checker
+    #print "the cg array is #{cg_array}"
+    ag_elements = alright_match_checker
+    #puts
+    #print "The number of alright elements is #{ag_elements}"
+    cg_elements = cg_array.count('A')
+    #puts 
+    #print "The number of correct guess elements is #{cg_elements}"
+    elements_left_over = [ag_elements - cg_elements, 0].max
+    #print "\nThe number of elements left over is #{elements_left_over}"
+    if elements_left_over > 0
+      j = 0
+      until elements_left_over == 0
+        cg_array[cg_elements + j] = 'B'
+        elements_left_over -= 1
+        j += 1
       end
-      i += 1
     end
+    @guessboard.append(cg_array)
+    puts 
+    #print "The guess array is #{cg_array} \n"
+    cg_array
   end
-=end
 
   def perfect_match_checker()
     correct_guess_array = ['C', 'C', 'C', 'C']
     i = 0
     cg_place = 0
     until i == correct_guess_array.length
-      puts "It is now checing index of #{i}"
+      #puts "It is now checing index of #{i}"
       if @current_guess[i] == @secret_code[i]
-        puts "#{@current_guess[i]} matches #{@secret_code}"
+        #puts "#{@current_guess[i]} matches #{@secret_code}"
         correct_guess_array[cg_place] = 'A'
         cg_place += 1
       end
@@ -103,6 +115,23 @@ class Display
       k += 1
     end
     copied_array
+  end
+
+  def game_won?(guess_array)
+    result = guess_array.all?('A')
+    if result == true
+      @game_won = true
+      @game_over = true
+    end
+  end
+
+  def display_boards
+    i = 0
+    print "\nGameboard:          Guessboard:\n"
+    until i == @gameboard.count
+      print "#{@gameboard[i]}        #{@guessboard[i]}\n"
+      i += 1
+    end 
   end
 end
 
@@ -178,20 +207,23 @@ al = Computer.new
 john = Human.new("John")
 game = Display.new
 
-
 sc = al.cpu_code_setter
 game.set_secret_code(sc)
 
 until game.game_over == true
   cg = john.human_code_guessor
   game.set_current_guess(cg)
- # temp = game.perfect_match_checker
- # print temp
-  ags = game.alright_match_checker
-  puts "The number of elements in guess found in secret code array is #{ags}"
-  puts
-  game.lives_reducer
+  guess_results = game.guess_checker
+  game.game_won?(guess_results)
   game.game_is_over?
+  game.lives_reducer
+  game.display_boards
 end
 
-print game.gameboard
+if game.game_won == true
+  puts 'Congrats, you have won the game'
+else
+  puts 'BOO, YOU HAVE LOST THE GAME!'
+  print "The secret code was #{game.secret_code}, better luck next time!"
+end
+
