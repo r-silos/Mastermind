@@ -209,6 +209,16 @@ game = Display.new
 
 sc = al.cpu_code_setter
 game.set_secret_code(sc)
+puts
+puts """Welcome to Mastermind, a game that will test your codebreaking and codemaking skills.
+You will play against the computer as either a codebreaker or codemaker.
+
+If you are a codebreaker, then it will be your responcibilty to crack the Computer's secret code.
+The Computer will randomly generate a 4 digit code made up from the numbers 1 to 6, with repititon allowed.
+
+After each guess, you will be prompted with feedback on the Guessboard. 
+The letter 'A' indicates one of your guesses is the right number in the right spot. The letter 'B' indicates that the letter is
+in the secret code, but not in the correct spot. Lastly, the letter 'C' indicates that one of the letters is not contained in the secret code"""
 
 until game.game_over == true
   cg = john.human_code_guessor
@@ -221,7 +231,7 @@ until game.game_over == true
 end
 
 if game.game_won == true
-  puts 'Congrats, you have won the game'
+  puts 'Congrats, you have won the game' 
 else
   puts 'BOO, YOU HAVE LOST THE GAME!'
   print "The secret code was #{game.secret_code}, better luck next time!"
