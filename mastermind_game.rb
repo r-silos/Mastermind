@@ -153,6 +153,29 @@ class Computer
     end
     return @random_code
   end
+
+  def all_possible_codes_generator
+    container = []
+    i = 0 
+    while i < CODE_NUMBERS.count
+      j = 0
+      while j < CODE_NUMBERS.count
+        k = 0
+        while k < CODE_NUMBERS.count
+          l = 0
+          while l < CODE_NUMBERS.count
+            temp = [CODE_NUMBERS[i],CODE_NUMBERS[j],CODE_NUMBERS[k],CODE_NUMBERS[l]]
+            container.append(temp)
+            l += 1
+          end
+          k += 1
+        end
+        j += 1
+      end
+      i += 1
+    end
+    container
+  end
 end
 
 class Human
@@ -245,6 +268,8 @@ if role_chosen == 1
   end
 else
   puts "this is the part where i put the logic for user playing as a codemaker"
+  all_codes = al.all_possible_codes_generator
+  print all_codes
 end
 
 if game.game_won == true
