@@ -6,7 +6,7 @@ class Display
   attr_reader :game_over, :gameboard, :game_won, :secret_code
 
   def initialize
-    @lives = 7
+    @lives = 11
     # gameboard keeps track of number guesses of codebreaker
     @gameboard = []
     # guessboard keeps track of whether each position is correct or not
@@ -40,6 +40,7 @@ class Display
     end
   end
 
+  #A sort of compound function that calls both perfect_match_checker and alright_match_checker and returns the final guessboard for that iteration of the user guess
   def guess_checker
     cg_array = perfect_match_checker
     #print "the cg array is #{cg_array}"
@@ -65,6 +66,7 @@ class Display
     cg_array
   end
 
+  #Sets up the Guessboard to give feedback to guess and checks what part of user guess is in secret code and in correct spot
   def perfect_match_checker()
     correct_guess_array = ['C', 'C', 'C', 'C']
     i = 0
@@ -81,6 +83,7 @@ class Display
     correct_guess_array
   end
 
+  #Function to run after perfect_match_checker() to see what guesses are in the secret code., but not in correct spot
   def alright_match_checker
     #puts "new iteration of checker is running"
     #print @secret_code
@@ -107,6 +110,7 @@ class Display
      number_of_alright_guesses
   end
 
+  #QnD function to close secret code as to combat pointer issues
   def secret_code_cloner
     k = 0
     copied_array = []
@@ -117,6 +121,7 @@ class Display
     copied_array
   end
 
+  #Function to check if game has been won
   def game_won?(guess_array)
     result = guess_array.all?('A')
     if result == true
@@ -125,6 +130,7 @@ class Display
     end
   end
 
+  #Function to display both gameboard and guessboard in an easily readible format
   def display_boards
     i = 0
     print "\nGameboard:          Guessboard:\n"
@@ -168,6 +174,7 @@ class Human
     return @human_code
   end
 
+  #Function to compartmentalize process to get imput for each guess with validation
   def human_code_guessor
     @human_code_guess = []
     print "\nwhat is your guess for the number in the first spot? : "
@@ -220,14 +227,24 @@ After each guess, you will be prompted with feedback on the Guessboard.
 The letter 'A' indicates one of your guesses is the right number in the right spot. The letter 'B' indicates that the letter is
 in the secret code, but not in the correct spot. Lastly, the letter 'C' indicates that one of the letters is not contained in the secret code"""
 
-until game.game_over == true
-  cg = john.human_code_guessor
-  game.set_current_guess(cg)
-  guess_results = game.guess_checker
-  game.game_won?(guess_results)
-  game.game_is_over?
-  game.lives_reducer
-  game.display_boards
+#NOTE: Will need to add print statement to explain how to play if human plays as a codemaker
+
+print "\nAlright Human, it's time to pick your role. Type 1 and press enter if you want to play as a codebreaker or type in 2 and press enter to play as a codemaker: "
+#I can add input vlaidation here later if i feel like being responcible
+role_chosen = gets.chomp.to_i
+
+if role_chosen == 1
+  until game.game_over == true
+    cg = john.human_code_guessor
+    game.set_current_guess(cg)
+    guess_results = game.guess_checker
+    game.game_won?(guess_results)
+    game.game_is_over?
+    game.lives_reducer
+    game.display_boards
+  end
+else
+  puts "this is the part where i put the logic for user playing as a codemaker"
 end
 
 if game.game_won == true
