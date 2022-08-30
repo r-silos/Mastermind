@@ -153,8 +153,9 @@ class Computer
     end
     return @random_code
   end
-
-  def all_possible_codes_generator
+  
+  #This function generates all 1296 iterations of secret code to help computer make its guess on secret code
+  def self.all_possible_codes_generator
     container = []
     i = 0 
     while i < CODE_NUMBERS.count
@@ -176,6 +177,21 @@ class Computer
     end
     container
   end
+
+  @@all_possible_codes_array = Computer.all_possible_codes_generator
+=begin
+  def self.fetch
+    @@all_possible_codes_array
+  end
+=end
+  def all_possible_codes_cloners
+    @instance_of_all_possible_codes = @@all_possible_codes_array
+  end
+
+  def first_turn_actions
+    all_possible_codes_array()
+  end
+  
 end
 
 class Human
@@ -186,14 +202,14 @@ class Human
   # If Human is code setter, allows the user to set the code while also validating correct input
   def human_code_setter
     @human_code = []
-    puts "Hello #{@name}, you will know be prompted to pick 4 numbers to be the code the computer will try to break "
+    puts "\nHello #{@name}, you will know be prompted to pick 4 numbers to be the code the computer will try to break "
     while @human_code.length != 4
       print 'type in a number from 1 to 6: '
       num = gets.chomp.to_i
       num = loop_validator(num)
       @human_code.append(num)
     end
-    print @human_code
+    #print @human_code
     return @human_code
   end
 
@@ -225,7 +241,7 @@ class Human
       return number
     else
         while !(CODE_NUMBERS.include?(number))
-          print '\nRUH ROE, that input was not in or between 1-6, please type in an interger in that range here: '
+          print "\nRUH ROE, that input was not in or between 1-6, please type in an interger in that range here: "
           number = gets.chomp.to_i
         end
         return number
@@ -237,8 +253,7 @@ al = Computer.new
 john = Human.new("John")
 game = Display.new
 
-sc = al.cpu_code_setter
-game.set_secret_code(sc)
+
 puts
 puts """Welcome to Mastermind, a game that will test your codebreaking and codemaking skills.
 You will play against the computer as either a codebreaker or codemaker.
@@ -257,9 +272,11 @@ print "\nAlright Human, it's time to pick your role. Type 1 and press enter if y
 role_chosen = gets.chomp.to_i
 
 if role_chosen == 1
+  computer_secret_code = al.cpu_code_setter
+  game.set_secret_code(computer_secret_code)
   until game.game_over == true
-    cg = john.human_code_guessor
-    game.set_current_guess(cg)
+    present_guess = john.human_code_guessor
+    game.set_current_guess(present_guess)
     guess_results = game.guess_checker
     game.game_won?(guess_results)
     game.game_is_over?
@@ -267,9 +284,12 @@ if role_chosen == 1
     game.display_boards
   end
 else
-  puts "this is the part where i put the logic for user playing as a codemaker"
-  all_codes = al.all_possible_codes_generator
-  print all_codes
+  human_secret_code = john.human_code_setter
+  game.set_secret_code(human_secret_code)
+  #We will make it that the first guess of the computer is always [1,1,2,2,]
+  game.set_current_guess[1,1,2,2]
+  
+  #print Computer.fetch
 end
 
 if game.game_won == true
