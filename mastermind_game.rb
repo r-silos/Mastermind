@@ -286,8 +286,9 @@ if role_chosen == 1
 else
   human_secret_code = john.human_code_setter
   game.set_secret_code(human_secret_code)
-  #We will make it that the first guess of the computer is always [1,1,2,2,]
+  #We will make it that the first guess of the computer is always [1,1,2,2]
   game.set_current_guess[1,1,2,2]
+  guess_results = game.guess_checker
   
   #print Computer.fetch
 end
