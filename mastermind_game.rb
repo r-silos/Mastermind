@@ -3,7 +3,7 @@
 CODE_NUMBERS = [1, 2, 3, 4, 5, 6]
 
 class Display
-  attr_reader :game_over, :gameboard, :game_won, :secret_code
+  attr_reader :game_over, :gameboard, :game_won, :secret_code, :current_guess
 
   def initialize
     @lives = 11
@@ -41,39 +41,34 @@ class Display
   end
 
   #A sort of compound function that calls both perfect_match_checker and alright_match_checker and returns the final guessboard for that iteration of the user guess
-  def guess_checker
-    cg_array = perfect_match_checker
-    #print "the cg array is #{cg_array}"
-    ag_elements = alright_match_checker
-    #puts
-    #print "The number of alright elements is #{ag_elements}"
-    cg_elements = cg_array.count('A')
+  def guess_checker(corr_guess_array, alright_guess_elements)
+    cg_elements = corr_guess_array.count('A')
     #puts 
     #print "The number of correct guess elements is #{cg_elements}"
-    elements_left_over = [ag_elements - cg_elements, 0].max
+    elements_left_over = [alright_guess_elements - cg_elements, 0].max
     #print "\nThe number of elements left over is #{elements_left_over}"
     if elements_left_over > 0
       j = 0
       until elements_left_over == 0
-        cg_array[cg_elements + j] = 'B'
+        corr_guess_array[cg_elements + j] = 'B'
         elements_left_over -= 1
         j += 1
       end
     end
-    @guessboard.append(cg_array)
+    @guessboard.append(corr_guess_array)
     puts 
     #print "The guess array is #{cg_array} \n"
-    cg_array
+    corr_guess_array
   end
 
   #Sets up the Guessboard to give feedback to guess and checks what part of user guess is in secret code and in correct spot
-  def perfect_match_checker()
+  def perfect_match_checker(current_gue, secret_gue)
     correct_guess_array = ['C', 'C', 'C', 'C']
     i = 0
     cg_place = 0
     until i == correct_guess_array.length
       #puts "It is now checing index of #{i}"
-      if @current_guess[i] == @secret_code[i]
+      if current_gue[i] == secret_gue[i]
         #puts "#{@current_guess[i]} matches #{@secret_code}"
         correct_guess_array[cg_place] = 'A'
         cg_place += 1
@@ -84,16 +79,16 @@ class Display
   end
 
   #Function to run after perfect_match_checker() to see what guesses are in the secret code., but not in correct spot
-  def alright_match_checker
+  def alright_match_checker(current_gue, secret_cod)
     #puts "new iteration of checker is running"
     #print @secret_code
     #puts
     number_of_alright_guesses = 0
     secret_code_copy = secret_code_cloner
-    @current_guess.each do |ele|
+    current_gue.each do |ele|
     #  puts "we are now checking #{ele}"
       i = 0
-      while i < @secret_code.count
+      while i < secret_cod.count
         if ele == secret_code_copy[i]
           number_of_alright_guesses += 1
      #     puts "we have matching elements of guess #{ele} and secret code of #{@secret_code[i]} with an index of #{i}"
@@ -141,7 +136,7 @@ class Display
   end
 end
 
-class Computer
+class Computer < Display
   attr_reader :random_code
 
   # If CPU is code setter, sets up a random combination as the code
@@ -274,10 +269,16 @@ role_chosen = gets.chomp.to_i
 if role_chosen == 1
   computer_secret_code = al.cpu_code_setter
   game.set_secret_code(computer_secret_code)
+  #print game.secret_code
   until game.game_over == true
     present_guess = john.human_code_guessor
     game.set_current_guess(present_guess)
-    guess_results = game.guess_checker
+    cg_array = game.perfect_match_checker(game.current_guess, game.secret_code)
+    ag_elements = game.alright_match_checker(game.current_guess, game.secret_code)
+    #puts "\nThe cg array is #{cg_array}"
+    #puts "the number of alright elements is #{ag_elements}"
+    guess_results = game.guess_checker(cg_array, ag_elements)
+    #print "\nThe final guess result is #{guess_results}"
     game.game_won?(guess_results)
     game.game_is_over?
     game.lives_reducer
@@ -287,8 +288,9 @@ else
   human_secret_code = john.human_code_setter
   game.set_secret_code(human_secret_code)
   #We will make it that the first guess of the computer is always [1,1,2,2]
-  game.set_current_guess[1,1,2,2]
-  guess_results = game.guess_checker
+  game.set_current_guess([1,1,2,2])
+  pgar = al.perfect_match_checker(game.current_guess, game.secret_code)
+  print "The perfect guess array for the initial guess is #{pgar}"
   
   #print Computer.fetch
 end
