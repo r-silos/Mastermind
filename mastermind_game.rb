@@ -55,8 +55,6 @@ class Display
         j += 1
       end
     end
-    @guessboard.append(corr_guess_array)
-    puts 
     #print "The guess array is #{cg_array} \n"
     corr_guess_array
   end
@@ -104,6 +102,10 @@ class Display
     end
      number_of_alright_guesses
   end
+
+def guessboard_appender(guest)
+  @guessboard.append(guest)
+end
 
   #QnD function to close secret code as to combat pointer issues
   def secret_code_cloner
@@ -181,9 +183,10 @@ class Computer < Display
 
   def guess_refiner(guess_array, guess_results)
     @instance_of_all_possible_codes.each_with_index do |ele, index|
-      cgr = perfect_match_checker(guess_array, ele)
-      algr = alright_match_checker(guess_array, ele)
+      cgr = perfect_match_checker(ele, guess_array)
+      algr = alright_match_checker(ele, guess_array)
       final = guess_checker(cgr, algr)
+      #print "\n\n#{final} is the guess array results for bot algo "
       if guess_results != final
         @instance_of_all_possible_codes.delete_at(index)
       end
@@ -283,6 +286,7 @@ if role_chosen == 1
     #puts "the number of alright elements is #{ag_elements}"
     guess_results = game.guess_checker(cg_array, ag_elements)
     #print "\nThe final guess result is #{guess_results}"
+    game.guessboard_appender(guess_results)
     game.game_won?(guess_results)
     game.game_is_over?
     game.lives_reducer
@@ -295,18 +299,35 @@ else
   #We will make it that the first guess of the computer is always [1,1,2,2]
   game.set_current_guess([1,1,2,2])
   pgar = al.perfect_match_checker(game.current_guess, game.secret_code)
-  print "The perfect guess array for the initial guess is #{pgar}"
-=begin
-  game.game_won?(pgar)
+  #print "The perfect guess array for the initial guess is #{pgar}"
+  alele = al.alright_match_checker(game.current_guess, game.secret_code)
+  final_guess_array = al.guess_checker(pgar, alele)
+  game.guessboard_appender(final_guess_array)
+  #print "The final guess array for this guess is #{final_guess_array}"
+  game.game_won?(final_guess_array)
   game.game_is_over?
-=end
-al.guess_refiner(game.current_guess, pgar)
-print game.instance_of_all_possible_codes
-
+  game.lives_reducer
+  game.display_boards
+  al.guess_refiner(game.current_guess, final_guess_array)
+  #print "the numer of possible guesses is #{al.instance_of_all_possible_codes.count}"
+  until game.game_over == true
+    game.set_current_guess(al.instance_of_all_possible_codes[0])
+    pgar = al.perfect_match_checker(game.current_guess, game.secret_code)
+    alele = al.alright_match_checker(game.current_guess, game.secret_code)
+    final_guess_array = al.guess_checker(pgar, alele)
+    game.guessboard_appender(final_guess_array)
+    game.game_won?(final_guess_array)
+    game.game_is_over?
+    game.lives_reducer
+    game.display_boards
+    al.guess_refiner(game.current_guess, final_guess_array)
+    
+    print "\nthe numer of possible guesses is #{al.instance_of_all_possible_codes.count}"
+  end
 end
 
 if game.game_won == true
-  puts 'Congrats, you have won the game' 
+  puts 'Congrats, you have won the game'
 else
   puts 'BOO, YOU HAVE LOST THE GAME!'
   print "The secret code was #{game.secret_code}, better luck next time!"
