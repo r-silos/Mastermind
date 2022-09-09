@@ -6,7 +6,7 @@ class Display
   attr_reader :game_over, :gameboard, :game_won, :secret_code, :current_guess
 
   def initialize
-    @lives = 5
+    @lives = 9
     # gameboard keeps track of number guesses of codebreaker
     @gameboard = []
     # guessboard keeps track of whether each position is correct or not
@@ -135,6 +135,13 @@ end
       print "#{@gameboard[i]}        #{@guessboard[i]}\n"
       i += 1
     end 
+  end
+
+  def final_guess_setter(current_guess, secret_code)
+    perfect_guesses = perfect_match_checker(current_guess, secret_code)
+    num_of_alright_guesses = alright_match_checker(current_guess, secret_code)
+    final_results_array = guess_checker(perfect_guesses,num_of_alright_guesses)
+    final_results_array
   end
 end
 
@@ -270,12 +277,7 @@ if role_chosen == 1
   until game.game_over == true
     present_guess = john.human_code_guessor
     game.set_current_guess(present_guess)
-    correct_guess_array = game.perfect_match_checker(game.current_guess, game.secret_code)
-    alright_guess_elements = game.alright_match_checker(game.current_guess, game.secret_code)
-    #puts "\nThe cg array is #{cg_array}"
-    #puts "the number of alright elements is #{ag_elements}"
-    guess_results = game.guess_checker(correct_guess_array, alright_guess_elements)
-    #print "\nThe final guess result is #{guess_results}"
+    guess_results = game.final_guess_setter(game.current_guess, game.secret_code)
     game.guessboard_appender(guess_results)
     game.game_won?(guess_results)
     game.game_is_over?
@@ -285,7 +287,9 @@ if role_chosen == 1
 else
   human_secret_code = john.human_code_setter
   game.set_secret_code(human_secret_code)
-  
+  game.set_current_guess([1,1,2,2])
+  ex = game.final_guess_setter(game.current_guess, game.secret_code)
+  print ex
 end
 
 if game.game_won == true
