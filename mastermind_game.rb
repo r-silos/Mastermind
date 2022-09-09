@@ -283,7 +283,9 @@ if role_chosen == 1
     game.display_boards
   end
 else
-  puts "that part of the game has not been coded yet"
+  human_secret_code = john.human_code_setter
+  game.set_secret_code(human_secret_code)
+  
 end
 
 if game.game_won == true
