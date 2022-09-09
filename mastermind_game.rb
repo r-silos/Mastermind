@@ -6,7 +6,7 @@ class Display
   attr_reader :game_over, :gameboard, :game_won, :secret_code, :current_guess
 
   def initialize
-    @lives = 11
+    @lives = 5
     # gameboard keeps track of number guesses of codebreaker
     @gameboard = []
     # guessboard keeps track of whether each position is correct or not
@@ -21,7 +21,7 @@ class Display
 
   def set_secret_code(code)
     @secret_code = code
-    #print @secret_code
+    print @secret_code
   end
 
   def set_current_guess(guess)
@@ -61,19 +61,19 @@ class Display
 
   #Sets up the Guessboard to give feedback to guess and checks what part of user guess is in secret code and in correct spot
   def perfect_match_checker(current_gue, secret_gue)
-    correct_guess_array = ['C', 'C', 'C', 'C']
+    initial_correct_guess_array = ['C', 'C', 'C', 'C']
     i = 0
     cg_place = 0
-    until i == correct_guess_array.length
+    until i == initial_correct_guess_array.length
       #puts "It is now checing index of #{i}"
       if current_gue[i] == secret_gue[i]
         #puts "#{@current_guess[i]} matches #{@secret_code}"
-        correct_guess_array[cg_place] = 'A'
+        initial_correct_guess_array[cg_place] = 'A'
         cg_place += 1
       end
       i += 1
     end
-    correct_guess_array
+    initial_correct_guess_array
   end
 
   #Function to run after perfect_match_checker() to see what guesses are in the secret code., but not in correct spot
@@ -181,17 +181,7 @@ class Computer < Display
     container
   end
 
-  def guess_refiner(guess_array, guess_results)
-    @instance_of_all_possible_codes.each_with_index do |ele, index|
-      cgr = perfect_match_checker(ele, guess_array)
-      algr = alright_match_checker(ele, guess_array)
-      final = guess_checker(cgr, algr)
-      #print "\n\n#{final} is the guess array results for bot algo "
-      if guess_results != final
-        @instance_of_all_possible_codes.delete_at(index)
-      end
-    end
-  end
+
 
 end
 
@@ -280,11 +270,11 @@ if role_chosen == 1
   until game.game_over == true
     present_guess = john.human_code_guessor
     game.set_current_guess(present_guess)
-    cg_array = game.perfect_match_checker(game.current_guess, game.secret_code)
-    ag_elements = game.alright_match_checker(game.current_guess, game.secret_code)
+    correct_guess_array = game.perfect_match_checker(game.current_guess, game.secret_code)
+    alright_guess_elements = game.alright_match_checker(game.current_guess, game.secret_code)
     #puts "\nThe cg array is #{cg_array}"
     #puts "the number of alright elements is #{ag_elements}"
-    guess_results = game.guess_checker(cg_array, ag_elements)
+    guess_results = game.guess_checker(correct_guess_array, alright_guess_elements)
     #print "\nThe final guess result is #{guess_results}"
     game.guessboard_appender(guess_results)
     game.game_won?(guess_results)
@@ -293,37 +283,7 @@ if role_chosen == 1
     game.display_boards
   end
 else
-  human_secret_code = john.human_code_setter
-  game.set_secret_code(human_secret_code)
-  al.set_secret_code(human_secret_code)
-  #We will make it that the first guess of the computer is always [1,1,2,2]
-  game.set_current_guess([1,1,2,2])
-  pgar = al.perfect_match_checker(game.current_guess, game.secret_code)
-  #print "The perfect guess array for the initial guess is #{pgar}"
-  alele = al.alright_match_checker(game.current_guess, game.secret_code)
-  final_guess_array = al.guess_checker(pgar, alele)
-  game.guessboard_appender(final_guess_array)
-  #print "The final guess array for this guess is #{final_guess_array}"
-  game.game_won?(final_guess_array)
-  game.game_is_over?
-  game.lives_reducer
-  game.display_boards
-  al.guess_refiner(game.current_guess, final_guess_array)
-  #print "the numer of possible guesses is #{al.instance_of_all_possible_codes.count}"
-  until game.game_over == true
-    game.set_current_guess(al.instance_of_all_possible_codes[0])
-    pgar = al.perfect_match_checker(game.current_guess, game.secret_code)
-    alele = al.alright_match_checker(game.current_guess, game.secret_code)
-    final_guess_array = al.guess_checker(pgar, alele)
-    game.guessboard_appender(final_guess_array)
-    game.game_won?(final_guess_array)
-    game.game_is_over?
-    game.lives_reducer
-    game.display_boards
-    al.guess_refiner(game.current_guess, final_guess_array)
-    
-    print "\nthe numer of possible guesses is #{al.instance_of_all_possible_codes.count}"
-  end
+  puts "that part of the game has not been coded yet"
 end
 
 if game.game_won == true
