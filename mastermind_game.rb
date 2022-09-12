@@ -82,7 +82,7 @@ class Display
     #print @secret_code
     #puts
     number_of_alright_guesses = 0
-    secret_code_copy = secret_code_cloner
+    secret_code_copy = secret_code_cloner(secret_cod)
     current_gue.each do |ele|
     #  puts "we are now checking #{ele}"
       i = 0
@@ -108,11 +108,11 @@ def guessboard_appender(guest)
 end
 
   #QnD function to close secret code as to combat pointer issues
-  def secret_code_cloner
+  def secret_code_cloner(secret_code)
     k = 0
     copied_array = []
-    while k < @secret_code.length
-      copied_array[k] = @secret_code[k]
+    while k < secret_code.length
+      copied_array[k] = secret_code[k]
       k += 1
     end
     copied_array
@@ -188,6 +188,15 @@ class Computer < Display
     container
   end
 
+  def guess_refiner(current_guess, current_guess_results, all_possible_codes)
+    all_possible_codes.each_with_index do |element, index|
+      element_guess_results = final_guess_setter(current_guess, element)
+      if element_guess_results != current_guess_results
+        all_possible_codes.delete_at(index)
+      end
+    end
+    all_possible_codes
+  end
 
 
 end
@@ -288,8 +297,25 @@ else
   human_secret_code = john.human_code_setter
   game.set_secret_code(human_secret_code)
   game.set_current_guess([1,1,2,2])
-  ex = game.final_guess_setter(game.current_guess, game.secret_code)
-  print ex
+  guess_results = game.final_guess_setter(game.current_guess, game.secret_code)
+  game.guessboard_appender(guess_results)
+  game.game_won?(guess_results)
+  game.game_is_over?
+  game.lives_reducer
+  game.display_boards
+  test = al.guess_refiner(game.current_guess, game.secret_code, al.instance_of_all_possible_codes)
+  #print test
+  #print "\n #{test.count}"
+  until game.game_over == true
+    game.set_current_guess(test[0])
+    guess_results = game.final_guess_setter(game.current_guess, game.secret_code)
+    game.guessboard_appender(guess_results)
+    game.game_won?(guess_results)
+    game.game_is_over?
+    game.lives_reducer
+    game.display_boards
+    test = al.guess_refiner(game.current_guess, game.secret_code, al.instance_of_all_possible_codes)
+  end
 end
 
 if game.game_won == true
